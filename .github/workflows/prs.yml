@@ -60,7 +60,8 @@ jobs:
         run: chmod +x ./gradlew
       - run: ./gradlew setup
       
-      - id: build
+      - if: success() || failure()
+        id: build
         name: Build the PR
         run: ./gradlew build
       - if: success() || failure()
@@ -73,7 +74,8 @@ jobs:
           check-name: CI Build
           token: ${{ secrets.GITHUB_TOKEN }}
           
-      - run: ./gradlew checkJarCompatibility
+      - if: success() || failure()
+        run: ./gradlew checkJarCompatibility
         id: compat-checks
       - if: success() || failure()
         name: Set compat checks status
@@ -85,7 +87,8 @@ jobs:
           check-name: CI Compatibility checks
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: ./gradlew checkAll
+      - if: success() || failure()
+        run: ./gradlew checkAll
         id: checks
       - if: success() || failure()
         name: Set checks status
@@ -97,7 +100,8 @@ jobs:
           check-name: CI Checks
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - run: ./gradlew :forge:genPatches failGitChanges
+      - if: success() || failure()
+        run: ./gradlew :forge:genPatches failGitChanges
         id: patch-correctness
       - if: success() || failure()
         name: Set patch corrrectness status
