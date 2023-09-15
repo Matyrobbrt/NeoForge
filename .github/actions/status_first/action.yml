@@ -23,4 +23,4 @@ runs:
         description: ${{ inputs.description }}
         state: 'pending'
         sha: ${{github.event.pull_request.head.sha || github.sha}}
-        target_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${ {inputs.job-id }}#step:${{ inputs.step-id }}
+        target_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${{inputs.job-id }}#step:${{ inputs.step-id }}
