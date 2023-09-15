@@ -1,0 +1,65 @@
+on:
+  pull_request:
+    types: [synchronize, open]
+  push:
+    branches:
+      - 1.20.x
+name: Build PRs
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout Repository'
+        uses: actions/checkout@main
+        with:
+          fetch-depth: 0
+
+      - name: Set build status to pending
+        uses: Sibz/github-status-action@v1
+        with: 
+          authToken: ${{secrets.GITHUB_TOKEN}}
+          context: 'CI Build'
+          description: 'Build in progress'
+          state: 'pending'
+          sha: ${{github.event.pull_request.head.sha || github.sha}}
+
+      
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+      - run: ./gradlew setup
+      
+      - id: build
+        name: Build the PR
+        run: ./gradlew build
+      - if: success() || failure()
+        name: Set build status
+        uses: Sibz/github-status-action@v1
+        with: 
+          authToken: ${{secrets.GITHUB_TOKEN}}
+          context: 'CI Build'
+          description: Build ${{ steps.build.outcome }}
+          state: ${{ steps.build.outcome }}
+          sha: ${{github.event.pull_request.head.sha || github.sha}}
+          
+      - if: steps.build.outcome == 'success'
+        name: Set checks status to pending
+        uses: Sibz/github-status-action@v1
+        with: 
+          authToken: ${{secrets.GITHUB_TOKEN}}
+          context: 'CI Compatibility checks'
+          description: 'Build in progress'
+          state: 'pending'
+          sha: ${{github.event.pull_request.head.sha || github.sha}}
+      - run: ./gradlew checkJarCompatibility
+        id: compat-checks
+      - if: success() || failure()
+        name: Set checks status to pending
+        uses: Sibz/github-status-action@v1
+        with: 
+          authToken: ${{secrets.GITHUB_TOKEN}}
+          context: 'CI Compatibility checks'
+          description: Build ${{ steps.compact-checks.outcome }}
+          state: ${{ steps.compact-checks.outcome }}
+          sha: ${{github.event.pull_request.head.sha || github.sha}}
