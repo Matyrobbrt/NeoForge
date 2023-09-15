@@ -14,6 +14,13 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Get Current Job Log URL
+        uses: Tiryoh/gha-jobid-action@v0
+        id: jobs
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          job_name: 'build'
+
       - name: Set build status to pending
         uses: Sibz/github-status-action@v1
         with: 
@@ -22,7 +29,18 @@ jobs:
           description: 'Build in progress'
           state: 'pending'
           sha: ${{github.event.pull_request.head.sha || github.sha}}
+          target_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ steps.jobs.outputs.job_id }}#step:8
 
+      - name: Set checks status to pending
+        uses: Sibz/github-status-action@v1
+        with: 
+          authToken: ${{secrets.GITHUB_TOKEN}}
+          context: 'CI Compatibility checks'
+          description: 'Build in progress'
+          state: 'pending'
+          sha: ${{github.event.pull_request.head.sha || github.sha}}
+          target_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ steps.jobs.outputs.job_id }}#step:10
+      
       
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2
@@ -42,24 +60,17 @@ jobs:
           description: Build ${{ steps.build.outcome }}
           state: ${{ steps.build.outcome }}
           sha: ${{github.event.pull_request.head.sha || github.sha}}
+          target_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ steps.jobs.outputs.job_id }}#step:8
           
-      - if: steps.build.outcome == 'success'
-        name: Set checks status to pending
-        uses: Sibz/github-status-action@v1
-        with: 
-          authToken: ${{secrets.GITHUB_TOKEN}}
-          context: 'CI Compatibility checks'
-          description: 'Build in progress'
-          state: 'pending'
-          sha: ${{github.event.pull_request.head.sha || github.sha}}
       - run: ./gradlew checkJarCompatibility
         id: compat-checks
       - if: success() || failure()
-        name: Set checks status to pending
+        name: Set checks status
         uses: Sibz/github-status-action@v1
         with: 
           authToken: ${{secrets.GITHUB_TOKEN}}
           context: 'CI Compatibility checks'
-          description: Build ${{ steps.compact-checks.outcome }}
-          state: ${{ steps.compact-checks.outcome }}
+          description: Build ${{ steps.compat-checks.outcome }}
+          state: ${{ steps.compat-checks.outcome }}
           sha: ${{github.event.pull_request.head.sha || github.sha}}
+          target_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ steps.jobs.outputs.job_id }}#step:10
