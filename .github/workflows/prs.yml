@@ -1,6 +1,6 @@
 on:
   pull_request:
-    types: [synchronize, open]
+    types: [synchronize, opened]
   push:
     branches:
       - 1.20.x
@@ -22,24 +22,32 @@ jobs:
           job_name: 'build'
 
       - name: Set build status to pending
-        uses: Sibz/github-status-action@v1
+        uses: ./status_first
         with: 
-          authToken: ${{secrets.GITHUB_TOKEN}}
-          context: 'CI Build'
-          description: 'Build in progress'
-          state: 'pending'
-          sha: ${{github.event.pull_request.head.sha || github.sha}}
-          target_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ steps.jobs.outputs.job_id }}#step:8
+          job-id: ${{ steps.jobs.outputs.job_id }}
+          step-id: 10
+          check-name: CI Build
+
+      - name: Set compat checks status to pending
+        uses: ./status_first
+        with: 
+          job-id: ${{ steps.jobs.outputs.job_id }}
+          step-id: 12
+          check-name: CI Compatibility checks
 
       - name: Set checks status to pending
-        uses: Sibz/github-status-action@v1
+        uses: ./status_first
         with: 
-          authToken: ${{secrets.GITHUB_TOKEN}}
-          context: 'CI Compatibility checks'
-          description: 'Build in progress'
-          state: 'pending'
-          sha: ${{github.event.pull_request.head.sha || github.sha}}
-          target_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ steps.jobs.outputs.job_id }}#step:10
+          job-id: ${{ steps.jobs.outputs.job_id }}
+          step-id: 14
+          check-name: CI Checks
+
+      - name: Set patch correctness status to pending
+        uses: ./status_first
+        with: 
+          job-id: ${{ steps.jobs.outputs.job_id }}
+          step-id: 16
+          check-name: Patch Correctness
       
       
       - name: Setup Gradle
@@ -53,24 +61,42 @@ jobs:
         run: ./gradlew build
       - if: success() || failure()
         name: Set build status
-        uses: Sibz/github-status-action@v1
+        uses: ./status
         with: 
-          authToken: ${{secrets.GITHUB_TOKEN}}
-          context: 'CI Build'
-          description: Build ${{ steps.build.outcome }}
-          state: ${{ steps.build.outcome }}
-          sha: ${{github.event.pull_request.head.sha || github.sha}}
-          target_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ steps.jobs.outputs.job_id }}#step:8
+          outcome: ${{ steps.build.outcome }}
+          job-id: ${{ steps.jobs.outputs.job_id }}
+          step-id: 10
+          check-name: CI Build
           
       - run: ./gradlew checkJarCompatibility
         id: compat-checks
       - if: success() || failure()
-        name: Set checks status
-        uses: Sibz/github-status-action@v1
+        name: Set compat checks status
+        uses: ./status
         with: 
-          authToken: ${{secrets.GITHUB_TOKEN}}
-          context: 'CI Compatibility checks'
-          description: Build ${{ steps.compat-checks.outcome }}
-          state: ${{ steps.compat-checks.outcome }}
-          sha: ${{github.event.pull_request.head.sha || github.sha}}
-          target_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs/${{ steps.jobs.outputs.job_id }}#step:10
+          outcome: ${{ steps.compat-checks.outcome }}
+          job-id: ${{ steps.jobs.outputs.job_id }}
+          step-id: 12
+          check-name: CI Compatibility checks
+
+      - run: ./gradlew checkAll
+        id: checks
+      - if: success() || failure()
+        name: Set checks status
+        uses: ./status
+        with: 
+          outcome: ${{ steps.checks.outcome }}
+          job-id: ${{ steps.jobs.outputs.job_id }}
+          step-id: 14
+          check-name: CI Checks
+
+      - run: ./gradlew :forge:genPatches failGitChanges
+        id: patch-correctness
+      - if: success() || failure()
+        name: Set patch corrrectness status
+        uses: ./status
+        with: 
+          outcome: ${{ steps.patch-correctness.outcome }}
+          job-id: ${{ steps.jobs.outputs.job_id }}
+          step-id: 16
+          check-name: Patch Correctness

@@ -1,0 +1,24 @@
+name: 'Set initial status check'
+inputs:
+  check-name:
+    required: true
+  job-id:
+    required: true
+  step-id:
+    required: true
+  description:
+    required: false
+    default: 'Build started'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Set check status to pending
+      uses: Sibz/github-status-action@v1
+      with: 
+        authToken: ${{secrets.GITHUB_TOKEN}}
+        context: ${{ inputs.check-name }}
+        description: ${{ inputs.description }}
+        state: 'pending'
+        sha: ${{github.event.pull_request.head.sha || github.sha}}
+        target_url: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}/job/${ {inputs.job-id }}#step:${{ inputs.step-id }}
