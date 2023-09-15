@@ -9,6 +9,8 @@ inputs:
   description:
     required: false
     default: 'Build started'
+  token:
+    required: true
 
 runs:
   using: "composite"
@@ -16,7 +18,7 @@ runs:
     - name: Set check status to pending
       uses: Sibz/github-status-action@v1
       with: 
-        authToken: ${{secrets.GITHUB_TOKEN}}
+        authToken: ${{ inputs.token }}
         context: ${{ inputs.check-name }}
         description: ${{ inputs.description }}
         state: 'pending'

@@ -27,6 +27,7 @@ jobs:
           job-id: ${{ steps.jobs.outputs.job_id }}
           step-id: 10
           check-name: CI Build
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set compat checks status to pending
         uses: ./.github/actions/status_first
@@ -34,6 +35,7 @@ jobs:
           job-id: ${{ steps.jobs.outputs.job_id }}
           step-id: 12
           check-name: CI Compatibility checks
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set checks status to pending
         uses: ./.github/actions/status_first
@@ -41,6 +43,7 @@ jobs:
           job-id: ${{ steps.jobs.outputs.job_id }}
           step-id: 14
           check-name: CI Checks
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Set patch correctness status to pending
         uses: ./.github/actions/status_first
@@ -48,6 +51,7 @@ jobs:
           job-id: ${{ steps.jobs.outputs.job_id }}
           step-id: 16
           check-name: Patch Correctness
+          token: ${{ secrets.GITHUB_TOKEN }}
       
       
       - name: Setup Gradle
@@ -67,6 +71,7 @@ jobs:
           job-id: ${{ steps.jobs.outputs.job_id }}
           step-id: 10
           check-name: CI Build
+          token: ${{ secrets.GITHUB_TOKEN }}
           
       - run: ./gradlew checkJarCompatibility
         id: compat-checks
@@ -78,6 +83,7 @@ jobs:
           job-id: ${{ steps.jobs.outputs.job_id }}
           step-id: 12
           check-name: CI Compatibility checks
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - run: ./gradlew checkAll
         id: checks
@@ -89,6 +95,7 @@ jobs:
           job-id: ${{ steps.jobs.outputs.job_id }}
           step-id: 14
           check-name: CI Checks
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - run: ./gradlew :forge:genPatches failGitChanges
         id: patch-correctness
@@ -100,3 +107,4 @@ jobs:
           job-id: ${{ steps.jobs.outputs.job_id }}
           step-id: 16
           check-name: Patch Correctness
+          token: ${{ secrets.GITHUB_TOKEN }}

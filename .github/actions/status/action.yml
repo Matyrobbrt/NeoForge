@@ -18,6 +18,8 @@ inputs:
     required: true
   step-id:
     required: true
+  token:
+    required: true
 
 runs:
   using: "composite"
@@ -25,7 +27,7 @@ runs:
     - name: Set check status
       uses: Sibz/github-status-action@v1
       with: 
-        authToken: ${{secrets.GITHUB_TOKEN}}
+        authToken: ${{inputs.token}}
         context: ${{ inputs.check-name }}
         description: ${{ inputs.outcome == 'failure' ? inputs.failure-desc : (inputs.outcome == 'success' ? inputs.success-desc : inputs.cancelled-desc) }}
         state: ${{ inputs.outcome }}
