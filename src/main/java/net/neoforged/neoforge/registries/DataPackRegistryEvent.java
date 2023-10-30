@@ -24,7 +24,7 @@ public abstract class DataPackRegistryEvent extends Event implements IModBusEven
     public DataPackRegistryEvent() {}
 
     /**
-     * Fired when datapack registries can be registered..... 
+     * Fired when datapack registries can be registered.
      * Datapack registries are registries which can only load entries through JSON files from datapacks.
      * <p>
      * Data JSONs will be loaded from {@code data/<datapack_namespace>/modid/registryname/}, where {@code modid} is the namespace of the registry key.
