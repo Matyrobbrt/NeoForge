@@ -1,0 +1,15 @@
+--- a/net/minecraft/data/structures/NbtToSnbt.java
++++ b/net/minecraft/data/structures/NbtToSnbt.java
+@@ -76,6 +_,12 @@
+       return "NBT -> SNBT";
+    }
+ 
++   @org.jetbrains.annotations.Nullable
++   @Override
++   public String getId() {
++      return getName();
++   }
++
+    private static String getName(Path p_126436_, Path p_126437_) {
+       String s = p_126436_.relativize(p_126437_).toString().replaceAll("\\\\", "/");
+       return s.substring(0, s.length() - ".nbt".length());

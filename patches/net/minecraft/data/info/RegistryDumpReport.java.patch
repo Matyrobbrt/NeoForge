@@ -1,0 +1,11 @@
+--- a/net/minecraft/data/info/RegistryDumpReport.java
++++ b/net/minecraft/data/info/RegistryDumpReport.java
+@@ -53,4 +_,8 @@
+    public final String getName() {
+       return "Registry Dump";
+    }
++   @Override
++   public String getId() {
++      return getName();
++   }
+ }

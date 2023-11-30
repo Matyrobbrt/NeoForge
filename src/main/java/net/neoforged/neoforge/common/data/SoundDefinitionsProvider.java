@@ -21,6 +21,7 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.sounds.SoundEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Data provider for the {@code sounds.json} file, which identifies sound definitions
@@ -66,7 +67,12 @@ public abstract class SoundDefinitionsProvider implements DataProvider {
 
     @Override
     public String getName() {
-        return "Sound Definitions";
+        return "Sound Definitions for mod " + modId;
+    }
+
+    @Override
+    public String getId() {
+        return getName();
     }
 
     // Quick helpers

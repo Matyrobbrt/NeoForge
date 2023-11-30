@@ -20,6 +20,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class LanguageProvider implements DataProvider {
     private final Map<String, String> data = new TreeMap<>();
@@ -47,7 +48,13 @@ public abstract class LanguageProvider implements DataProvider {
 
     @Override
     public String getName() {
-        return "Languages: " + locale;
+        return "Languages: " + locale + " for mod " + modid;
+    }
+
+    @Nullable
+    @Override
+    public String getId() {
+        return getName();
     }
 
     private CompletableFuture<?> save(CachedOutput cache, Path target) {

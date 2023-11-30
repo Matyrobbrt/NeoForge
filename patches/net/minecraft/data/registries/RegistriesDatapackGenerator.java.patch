@@ -55,3 +55,13 @@
                       .map(
                          p_256105_ -> dumpValue(
                                packoutput$pathprovider.json(p_256105_.key().location()), p_256502_, p_256000_, p_256449_.elementCodec(), (T)p_256105_.value()
+@@ -77,5 +_,9 @@
+    @Override
+    public String getName() {
+       return "Registries";
++   }
++   @Override
++   public String getId() {
++       return getName();
+    }
+ }

@@ -1,0 +1,13 @@
+--- a/net/minecraft/data/metadata/PackMetadataGenerator.java
++++ b/net/minecraft/data/metadata/PackMetadataGenerator.java
+@@ -42,6 +_,10 @@
+    public final String getName() {
+       return "Pack Metadata";
+    }
++   @Override
++   public String getId() {
++      return getName();
++   }
+ 
+    public static PackMetadataGenerator forFeaturePack(PackOutput p_256281_, Component p_255661_) {
+       return new PackMetadataGenerator(p_256281_)
