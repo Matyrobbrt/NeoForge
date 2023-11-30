@@ -1,3 +1,13 @@
+import groovy.transform.CompileStatic
+import groovyjarjarasm.asm.ClassReader
+import groovyjarjarasm.asm.Opcodes
+import groovyjarjarasm.asm.tree.ClassNode
+
+import java.lang.reflect.Modifier
+import java.nio.file.FileSystems
+import java.nio.file.Files
+import java.util.function.Predicate
+
 plugins {
     id 'java-library'
     id 'maven-publish'
@@ -217,8 +227,23 @@ artifacts {
     }
 }
 
-minecraft {
-    modIdentifier 'minecraft'
+tasks.register('generateATs', GenerateATsTask.class).configure {
+    getMCJar().set(project(':base').tasks.named('jar', Jar).flatMap { it.archiveFile })
+    group(
+            'DataProvider names',
+            isChildrenOf('net/minecraft/data/DataProvider'),
+            methods('public-f', 'getName()Ljava/lang/String;')
+    )
+    group(
+            'Recipe provider utilities',
+            isNamed('net/minecraft/data/recipes/RecipeProvider'),
+            makeMethodsPublic { Modifier.isStatic(it) && Modifier.isProtected(it) }
+    )
+    group(
+            'Render states',
+            isNamed('net/minecraft/client/renderer/RenderStateShard'),
+            makeFieldsPublic { Modifier.isProtected(it) && Modifier.isStatic(it) }
+    )
 }
 
 publishing {
@@ -284,5 +309,155 @@ publishing {
     }
     repositories {
         maven rootProject.gradleutils.getPublishingMaven()
+    }
+}
+
+class Group {
+    private final String name
+    private final ClassPredicate predicate
+    private final ATProvider provider
+
+    Group(String name, ClassPredicate predicate, ATProvider prov) {
+        this.name = name
+        this.predicate = predicate
+        this.provider = prov
+    }
+}
+
+interface ClassPredicate {
+    boolean test(ClassNode node, List<String> parents)
+}
+
+interface ATProvider {
+    default Collection<WithAccessModifier> provideMethods(ClassNode node) {
+        return []
+    }
+
+    default Collection<WithAccessModifier> provideFields(ClassNode node) {
+        return []
+    }
+}
+
+class WithAccessModifier {
+    final String modifier, value
+
+    WithAccessModifier(String modifier, String value) {
+        this.modifier = modifier
+        this.value = value
+    }
+}
+
+static ATProvider methods(String modifier, String... names) {
+    return new ATProvider() {
+        @Override
+        Collection<WithAccessModifier> provideMethods(ClassNode node) {
+            return node.methods.findAll {
+                (it.name + it.desc) in names
+            }.collect {
+                new WithAccessModifier(modifier, it.name + it.desc)
+            }
+        }
+    }
+}
+
+static ATProvider makeMethodsPublic(Predicate<Integer> accessLevel) {
+    return new ATProvider() {
+        @Override
+        Collection<WithAccessModifier> provideMethods(ClassNode node) {
+            return node.methods.findAll {
+                accessLevel.test(it.access)
+            }.collect {
+                new WithAccessModifier('public', it.name + it.desc)
+            }
+        }
+    }
+}
+
+static ATProvider makeFieldsPublic(Predicate<Integer> accessLevel) {
+    return new ATProvider() {
+        @Override
+        Collection<WithAccessModifier> provideFields(ClassNode node) {
+            return node.fields.findAll {
+                accessLevel.test(it.access)
+            }.collect {
+                new WithAccessModifier('public', it.name)
+            }
+        }
+    }
+}
+
+static ClassPredicate isChildrenOf(String parent) {
+    return (ClassNode node, List<String> parents) -> parents.contains(parent)
+}
+
+static ClassPredicate isNamed(String clazz) {
+    return (ClassNode node, List<String> parents) -> node.name == clazz
+}
+
+abstract class GenerateATsTask extends DefaultTask {
+    @InputFile
+    abstract RegularFileProperty getMCJar()
+
+    public final List<Group> groups = []
+
+    void group(String name, ClassPredicate predicate, ATProvider provider) {
+        groups.add(new Group(name, predicate, provider))
+    }
+
+    @TaskAction
+    void run() {
+        final Map<String, ClassNode> classes = [:]
+        FileSystems.newFileSystem((getMCJar().get().asFile as File).toPath(), (ClassLoader) null).withCloseable {
+            Files.walk(it.getPath('net/minecraft')).withCloseable { dirs ->
+                dirs.forEach { file ->
+                    if (file.toString().endsWith('.class')) {
+                        final cn = new ClassNode(Opcodes.ASM9)
+                        new ClassReader(Files.readAllBytes(file)).accept(cn, ClassReader.SKIP_CODE)
+                        classes.put(cn.name, cn)
+                    }
+                }
+            }
+        }
+
+        final Map<String, List<String>> allParents = [:]
+        classes.forEach { name, cls ->
+            allParents[name] = getParents(classes, cls)
+        }
+
+        final atFile = new StringBuilder()
+
+        groups.each { group ->
+            atFile.append('# ' + group.name)
+
+            classes.values().each { clz ->
+                if (group.predicate.test(clz, allParents[clz.name])) {
+                    group.provider.provideMethods(clz).each {
+                        atFile.append("\n${it.modifier} ${clz.name.replace('/', '.')} ${it.value}")
+                    }
+                    group.provider.provideFields(clz).each {
+                        atFile.append("\n${it.modifier} ${clz.name.replace('/', '.')} ${it.value}")
+                    }
+                }
+            }
+
+            atFile.append('\n\n')
+        }
+
+        println(atFile.toString())
+    }
+
+    List<String> getParents(Map<String, ClassNode> classes, ClassNode clazz) {
+        final direct = [] as List<String>
+        direct.add(clazz.superName)
+        direct.addAll(clazz.interfaces)
+
+        final fromChildren = [] as List<String>
+        direct.forEach {
+            if (classes[it]) {
+                fromChildren.addAll(getParents(classes, classes[it]))
+            }
+        }
+
+        return direct + fromChildren
     }
 }
