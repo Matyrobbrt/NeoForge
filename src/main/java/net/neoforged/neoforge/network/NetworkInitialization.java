@@ -22,6 +22,7 @@ import net.neoforged.neoforge.network.payload.FrozenRegistrySyncStartPayload;
 import net.neoforged.neoforge.network.payload.KnownRegistryDataMapsPayload;
 import net.neoforged.neoforge.network.payload.KnownRegistryDataMapsReplyPayload;
 import net.neoforged.neoforge.network.payload.RegistryDataMapSyncPayload;
+import net.neoforged.neoforge.network.payload.SetCustomContainerDataPayload;
 import net.neoforged.neoforge.network.payload.TierSortingRegistryPayload;
 import net.neoforged.neoforge.network.payload.TierSortingRegistrySyncCompletePayload;
 import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
@@ -88,6 +89,9 @@ public class NetworkInitialization {
                         handlers -> handlers.client(ClientRegistryManager::handleDataMapSync))
                 .play(AdvancedContainerSetDataPayload.ID,
                         AdvancedContainerSetDataPayload::new,
+                        handlers -> handlers.client(ClientPayloadHandler.getInstance()::handle))
+                .play(SetCustomContainerDataPayload.ID,
+                        SetCustomContainerDataPayload::new,
                         handlers -> handlers.client(ClientPayloadHandler.getInstance()::handle));
     }
 }

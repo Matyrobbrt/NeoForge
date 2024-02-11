@@ -1,5 +1,50 @@
 --- a/net/minecraft/world/inventory/AbstractContainerMenu.java
 +++ b/net/minecraft/world/inventory/AbstractContainerMenu.java
+@@ -46,6 +_,7 @@
+     private final NonNullList<ItemStack> lastSlots = NonNullList.create();
+     public final NonNullList<Slot> slots = NonNullList.create();
+     private final List<DataSlot> dataSlots = Lists.newArrayList();
++    private final List<net.neoforged.neoforge.common.container.ICustomDataSlot> customDataSlots = Lists.newArrayList();
+     private ItemStack carried = ItemStack.EMPTY;
+     private final NonNullList<ItemStack> remoteSlots = NonNullList.create();
+     private final IntList remoteDataSlots = new IntArrayList();
+@@ -116,6 +_,11 @@
+         return p_38896_;
+     }
+ 
++    protected <T extends net.neoforged.neoforge.common.container.ICustomDataSlot> T addDataSlot(T slot) {
++        this.customDataSlots.add(slot);
++        return slot;
++    }
++
+     protected void addDataSlots(ContainerData p_38885_) {
+         for(int i = 0; i < p_38885_.getCount(); ++i) {
+             this.addDataSlot(DataSlot.forContainer(p_38885_, i));
+@@ -150,6 +_,9 @@
+ 
+         if (this.synchronizer != null) {
+             this.synchronizer.sendInitialData(this, this.remoteSlots, this.remoteCarried, this.remoteDataSlots.toIntArray());
++            for (int id = 0; id < this.customDataSlots.size(); id++) {
++                this.synchronizer.sendCustomDataChanged(this, id, this.customDataSlots.get(0));
++            }
+         }
+     }
+ 
+@@ -186,6 +_,14 @@
+ 
+             this.synchronizeDataSlotToRemote(j, k);
+         }
++
++        for (int id = 0; id < customDataSlots.size(); id++) {
++            var slot = customDataSlots.get(id);
++            if (slot.isDirty() && synchronizer != null) {
++                slot.update();
++                synchronizer.sendCustomDataChanged(this, id, slot);
++            }
++        }
+     }
+ 
+     public void broadcastFullState() {
 @@ -404,6 +_,7 @@
                  ItemStack itemstack10 = this.getCarried();
                  p_150434_.updateTutorialInventoryAction(itemstack10, slot7.getItem(), clickaction);
@@ -8,6 +53,17 @@
                      if (itemstack9.isEmpty()) {
                          if (!itemstack10.isEmpty()) {
                              int i3 = clickaction == ClickAction.PRIMARY ? itemstack10.getCount() : 1;
+@@ -594,6 +_,10 @@
+         this.dataSlots.get(p_38855_).set(p_38856_);
+     }
+ 
++    public net.neoforged.neoforge.common.container.ICustomDataSlot getCustomDataSlot(int id) {
++        return customDataSlots.get(id);
++    }
++
+     public abstract boolean stillValid(Player p_38874_);
+ 
+     protected boolean moveItemStackTo(ItemStack p_38904_, int p_38905_, int p_38906_, boolean p_38907_) {
 @@ -609,14 +_,15 @@
                  ItemStack itemstack = slot.getItem();
                  if (!itemstack.isEmpty() && ItemStack.isSameItemSameTags(p_38904_, itemstack)) {

@@ -1,8 +1,17 @@
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -234,6 +_,10 @@
+@@ -233,7 +_,19 @@
+             this.broadcastDataValue(p_143437_, p_143438_, p_143439_);
          }
  
++        @Override
++        public void sendCustomDataChanged(AbstractContainerMenu menu, int id, net.neoforged.neoforge.common.container.ICustomDataSlot slot) {
++            final var buffer = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
++            slot.write(buffer);
++            ServerPlayer.this.connection.send(new net.neoforged.neoforge.network.payload.SetCustomContainerDataPayload(menu.containerId, id, buffer.array()));
++            buffer.release();
++        }
++
          private void broadcastDataValue(AbstractContainerMenu p_143455_, int p_143456_, int p_143457_) {
 +            if (ServerPlayer.this.connection.isConnected(net.neoforged.neoforge.network.payload.AdvancedContainerSetDataPayload.ID)) {
 +                ServerPlayer.this.connection.send(new net.neoforged.neoforge.network.payload.AdvancedContainerSetDataPayload(p_143455_.containerId, p_143456_, p_143457_));

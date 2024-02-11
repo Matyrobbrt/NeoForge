@@ -21,6 +21,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.neoforged.neoforge.common.TierSortingRegistry;
@@ -38,6 +39,7 @@ import net.neoforged.neoforge.network.payload.ConfigFilePayload;
 import net.neoforged.neoforge.network.payload.FrozenRegistryPayload;
 import net.neoforged.neoforge.network.payload.FrozenRegistrySyncCompletedPayload;
 import net.neoforged.neoforge.network.payload.FrozenRegistrySyncStartPayload;
+import net.neoforged.neoforge.network.payload.SetCustomContainerDataPayload;
 import net.neoforged.neoforge.network.payload.TierSortingRegistryPayload;
 import net.neoforged.neoforge.registries.RegistryManager;
 import net.neoforged.neoforge.registries.RegistrySnapshot;
@@ -157,5 +159,16 @@ public class ClientPayloadHandler {
 
     public void handle(AdvancedContainerSetDataPayload msg, PlayPayloadContext context) {
         context.packetHandler().handle(msg.toVanillaPacket());
+    }
+
+    public void handle(SetCustomContainerDataPayload msg, PlayPayloadContext context) {
+        context.workHandler().submitAsync(() -> {
+            final Player player = context.player().orElseThrow();
+            if (player.containerMenu != null && player.containerMenu.containerId == msg.containerId()) {
+                final FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.wrappedBuffer(msg.value()));
+                player.containerMenu.getCustomDataSlot(msg.dataId()).read(buf);
+                buf.release();
+            }
+        });
     }
 }
