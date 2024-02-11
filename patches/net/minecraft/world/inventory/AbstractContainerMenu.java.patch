@@ -4,7 +4,7 @@
      private final NonNullList<ItemStack> lastSlots = NonNullList.create();
      public final NonNullList<Slot> slots = NonNullList.create();
      private final List<DataSlot> dataSlots = Lists.newArrayList();
-+    private final List<net.neoforged.neoforge.common.container.ICustomDataSlot> customDataSlots = Lists.newArrayList();
++    private final List<net.neoforged.neoforge.common.container.ICustomDataSlot<?>> customDataSlots = Lists.newArrayList();
      private ItemStack carried = ItemStack.EMPTY;
      private final NonNullList<ItemStack> remoteSlots = NonNullList.create();
      private final IntList remoteDataSlots = new IntArrayList();
@@ -12,7 +12,7 @@
          return p_38896_;
      }
  
-+    protected <T extends net.neoforged.neoforge.common.container.ICustomDataSlot> T addDataSlot(T slot) {
++    protected <T extends net.neoforged.neoforge.common.container.ICustomDataSlot<?>> T addDataSlot(T slot) {
 +        this.customDataSlots.add(slot);
 +        return slot;
 +    }
@@ -38,7 +38,7 @@
 +        for (int id = 0; id < customDataSlots.size(); id++) {
 +            var slot = customDataSlots.get(id);
 +            if (slot.isDirty() && synchronizer != null) {
-+                slot.update();
++                slot.updateCache();
 +                synchronizer.sendCustomDataChanged(this, id, slot);
 +            }
 +        }
@@ -57,7 +57,7 @@
          this.dataSlots.get(p_38855_).set(p_38856_);
      }
  
-+    public net.neoforged.neoforge.common.container.ICustomDataSlot getCustomDataSlot(int id) {
++    public net.neoforged.neoforge.common.container.ICustomDataSlot<?> getCustomDataSlot(int id) {
 +        return customDataSlots.get(id);
 +    }
 +

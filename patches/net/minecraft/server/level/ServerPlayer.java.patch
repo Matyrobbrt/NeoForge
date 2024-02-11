@@ -7,7 +7,7 @@
 +        @Override
 +        public void sendCustomDataChanged(AbstractContainerMenu menu, int id, net.neoforged.neoforge.common.container.ICustomDataSlot slot) {
 +            final var buffer = new net.minecraft.network.FriendlyByteBuf(io.netty.buffer.Unpooled.buffer());
-+            slot.write(buffer);
++            buffer.writeJsonWithCodec(slot.getNetworkCodec(), slot.getValue());
 +            ServerPlayer.this.connection.send(new net.neoforged.neoforge.network.payload.SetCustomContainerDataPayload(menu.containerId, id, buffer.array()));
 +            buffer.release();
 +        }

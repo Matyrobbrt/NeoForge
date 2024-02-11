@@ -1,16 +1,14 @@
 package net.neoforged.neoforge.common.container;
 
 import com.mojang.serialization.Codec;
-import net.minecraft.network.FriendlyByteBuf;
 
 import java.util.function.BiPredicate;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.IntSupplier;
 import java.util.function.Supplier;
-import java.util.function.UnaryOperator;
 
-public class ImmutableCustomDataSlot<T> implements ICustomDataSlot {
+public class ImmutableCustomDataSlot<T> implements ICustomDataSlot<T> {
     private T cached;
 
     private final Supplier<T> reader;
@@ -35,18 +33,22 @@ public class ImmutableCustomDataSlot<T> implements ICustomDataSlot {
     }
 
     @Override
-    public void update() {
+    public void updateCache() {
         cached = reader.get();
     }
 
     @Override
-    public void write(FriendlyByteBuf buffer) {
-        buffer.writeJsonWithCodec(codec, reader.get());
+    public Codec<T> getNetworkCodec() {
+        return codec;
     }
 
     @Override
-    public void read(FriendlyByteBuf buffer) {
-        final T value = buffer.readJsonWithCodec(codec);
-        writer.accept(cached = value);
+    public T getValue() {
+        return reader.get();
+    }
+
+    @Override
+    public void updateValue(T value) {
+        writer.accept(value);
     }
 }

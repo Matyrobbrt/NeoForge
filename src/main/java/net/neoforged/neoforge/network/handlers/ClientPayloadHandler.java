@@ -25,6 +25,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.neoforged.neoforge.common.TierSortingRegistry;
+import net.neoforged.neoforge.common.container.ICustomDataSlot;
 import net.neoforged.neoforge.common.world.AuxiliaryLightManager;
 import net.neoforged.neoforge.common.world.LevelChunkAuxiliaryLightManager;
 import net.neoforged.neoforge.entity.IEntityWithComplexSpawn;
@@ -166,9 +167,13 @@ public class ClientPayloadHandler {
             final Player player = context.player().orElseThrow();
             if (player.containerMenu != null && player.containerMenu.containerId == msg.containerId()) {
                 final FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.wrappedBuffer(msg.value()));
-                player.containerMenu.getCustomDataSlot(msg.dataId()).read(buf);
+                update(player.containerMenu.getCustomDataSlot(msg.dataId()), buf);
                 buf.release();
             }
         });
+    }
+
+    private <T> void update(ICustomDataSlot<T> slot, FriendlyByteBuf buf) {
+        slot.updateValue(buf.readJsonWithCodec(slot.getNetworkCodec())));
     }
 }

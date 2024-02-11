@@ -1,13 +1,13 @@
 package net.neoforged.neoforge.common.container;
 
-import net.minecraft.network.FriendlyByteBuf;
+import com.mojang.serialization.Codec;
 
-public interface ICustomDataSlot {
+public interface ICustomDataSlot<T> {
     boolean isDirty();
 
-    void update();
+    void updateCache();
 
-    void write(FriendlyByteBuf buffer);
-
-    void read(FriendlyByteBuf buffer);
+    Codec<T> getNetworkCodec();
+    T getValue();
+    void updateValue(T value);
 }
