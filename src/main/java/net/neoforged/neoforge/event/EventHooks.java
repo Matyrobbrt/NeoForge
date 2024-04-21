@@ -114,6 +114,7 @@ import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
 import net.neoforged.neoforge.event.entity.interaction.EntityInteractEvent;
 import net.neoforged.neoforge.event.entity.interaction.RightClickBlockEvent;
+import net.neoforged.neoforge.event.entity.interaction.RightClickItemEvent;
 import net.neoforged.neoforge.event.entity.item.ItemExpireEvent;
 import net.neoforged.neoforge.event.entity.living.AnimalTameEvent;
 import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
@@ -432,6 +433,13 @@ public class EventHooks {
     @Nullable
     public static InteractionResult onEntityInteract(Player player, Entity entity, InteractionHand hand, Vec3 hitVec) {
         var event = new EntityInteractEvent(player, entity, hand, hitVec);
+        NeoForge.EVENT_BUS.post(event);
+        return event.isCanceled() ? event.getInteractionResult() : null;
+    }
+
+    @Nullable
+    public static InteractionResultHolder<ItemStack> onItemRightClick(Level level, Player player, ItemStack stack, InteractionHand hand) {
+        var event = new RightClickItemEvent(player, level, stack, hand);
         NeoForge.EVENT_BUS.post(event);
         return event.isCanceled() ? event.getInteractionResult() : null;
     }

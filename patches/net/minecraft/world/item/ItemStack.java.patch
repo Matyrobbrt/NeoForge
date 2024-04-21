@@ -57,6 +57,15 @@
              if (player != null && interactionresult.indicateItemUse()) {
                  player.awardStat(Stats.ITEM_USED.get(item));
              }
+@@ -359,6 +_,8 @@
+     }
+ 
+     public InteractionResultHolder<ItemStack> use(Level p_41683_, Player p_41684_, InteractionHand p_41685_) {
++        var fromEvent = net.neoforged.neoforge.event.EventHooks.onItemRightClick(p_41683_, p_41684_, this, p_41685_);
++        if (fromEvent != null) return fromEvent;
+         return this.getItem().use(p_41683_, p_41684_, p_41685_);
+     }
+ 
 @@ -387,7 +_,7 @@
      }
  
