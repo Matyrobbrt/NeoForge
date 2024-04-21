@@ -168,15 +168,6 @@
              float f = p_36313_ - f1;
              if (f > 0.0F && f < 3.4028235E37F) {
                  this.awardStat(Stats.DAMAGE_ABSORBED, Math.round(f * 10.0F));
-@@ -1011,6 +_,8 @@
- 
-             return InteractionResult.PASS;
-         } else {
-+            InteractionResult cancelResult = net.neoforged.neoforge.common.CommonHooks.onInteractEntity(this, p_36158_, p_36159_);
-+            if (cancelResult != null) return cancelResult;
-             ItemStack itemstack = this.getItemInHand(p_36159_);
-             ItemStack itemstack1 = itemstack.copy();
-             InteractionResult interactionresult = p_36158_.interact(this, p_36159_);
 @@ -1019,6 +_,9 @@
                      itemstack.setCount(itemstack1.getCount());
                  }

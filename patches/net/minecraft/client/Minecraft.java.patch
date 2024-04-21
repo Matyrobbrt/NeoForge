@@ -275,11 +275,8 @@
                  switch (this.hitResult.getType()) {
                      case ENTITY:
                          this.gameMode.attack(this.player, ((EntityHitResult)this.hitResult).getEntity());
-@@ -1713,8 +_,10 @@
-                         }
- 
+@@ -1715,6 +_,7 @@
                          this.player.resetAttackStrengthTicker();
-+                        net.neoforged.neoforge.common.CommonHooks.onEmptyLeftClick(this.player);
                  }
  
 +                if (inputEvent.shouldSwingHand())
@@ -316,16 +313,6 @@
                                          this.player.swing(interactionhand);
                                          if (!itemstack.isEmpty() && (itemstack.getCount() != i || this.gameMode.hasInfiniteItems())) {
                                              this.gameRenderer.itemInHandRenderer.itemUsed(interactionhand);
-@@ -1778,6 +_,9 @@
-                         }
-                     }
- 
-+                    if (itemstack.isEmpty() && (this.hitResult == null || this.hitResult.getType() == HitResult.Type.MISS))
-+                        net.neoforged.neoforge.common.CommonHooks.onEmptyClick(this.player, interactionhand);
-+
-                     if (!itemstack.isEmpty()) {
-                         InteractionResult interactionresult2 = this.gameMode.useItem(this.player, interactionhand);
-                         if (interactionresult2.consumesAction()) {
 @@ -1808,6 +_,8 @@
              this.rightClickDelay--;
          }

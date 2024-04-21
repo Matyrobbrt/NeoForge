@@ -133,16 +133,6 @@
              return this.pushReaction;
          }
  
-@@ -723,6 +_,9 @@
-         }
- 
-         public ItemInteractionResult useItemOn(ItemStack p_316374_, Level p_316651_, Player p_316623_, InteractionHand p_316469_, BlockHitResult p_316877_) {
-+            var useOnContext = new net.minecraft.world.item.context.UseOnContext(p_316651_, p_316623_, p_316469_, p_316623_.getItemInHand(p_316469_).copy(), p_316877_);
-+            var e = net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.entity.player.UseItemOnBlockEvent(useOnContext, net.neoforged.neoforge.event.entity.player.UseItemOnBlockEvent.UsePhase.BLOCK));
-+            if (e.isCanceled()) return e.getCancellationResult();
-             return this.getBlock().useItemOn(p_316374_, this.asState(), p_316651_, p_316877_.getBlockPos(), p_316623_, p_316469_, p_316877_);
-         }
- 
 @@ -824,6 +_,7 @@
              return this.getBlock().getSeed(this.asState(), p_60727_);
          }
