@@ -43,6 +43,7 @@ import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -90,6 +91,7 @@ import net.minecraft.world.level.portal.PortalShape;
 import net.minecraft.world.level.storage.PlayerDataStorage;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.loot.LootTable;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.Event.Result;
@@ -110,6 +112,7 @@ import net.neoforged.neoforge.event.entity.EntityMountEvent;
 import net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
+import net.neoforged.neoforge.event.entity.RightClickBlockEvent;
 import net.neoforged.neoforge.event.entity.item.ItemExpireEvent;
 import net.neoforged.neoforge.event.entity.living.AnimalTameEvent;
 import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
@@ -395,6 +398,27 @@ public class EventHooks {
         LivingEntityUseItemEvent.Finish event = new LivingEntityUseItemEvent.Finish(entity, item, duration, result);
         NeoForge.EVENT_BUS.post(event);
         return event.getResultStack();
+    }
+
+    @Nullable
+    public static ItemInteractionResult onActivateBlock(ItemStack stack, Level level, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        var event = new RightClickBlockEvent.ActivateBlock(player, level, hitResult, hand, stack);
+        NeoForge.EVENT_BUS.post(event);
+        return event.isCanceled() ? event.getInteractionResult() : null;
+    }
+
+    @Nullable
+    public static InteractionResult onUseItem(UseOnContext context) {
+        var event = new RightClickBlockEvent.UseItem(context);
+        NeoForge.EVENT_BUS.post(event);
+        return event.isCanceled() ? event.getInteractionResult() : null;
+    }
+
+    @Nullable
+    public static InteractionResult onUseBlockWithoutItem(Level level, Player player, BlockHitResult hitResult) {
+        var event = new RightClickBlockEvent.UseBlockWithoutItem(level, player, hitResult);
+        NeoForge.EVENT_BUS.post(event);
+        return event.isCanceled() ? event.getInteractionResult() : null;
     }
 
     public static void onStartEntityTracking(Entity entity, Player player) {

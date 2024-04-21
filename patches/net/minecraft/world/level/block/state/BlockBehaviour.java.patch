@@ -133,6 +133,21 @@
              return this.pushReaction;
          }
  
+@@ -723,10 +_,14 @@
+         }
+ 
+         public ItemInteractionResult useItemOn(ItemStack p_316374_, Level p_316651_, Player p_316623_, InteractionHand p_316469_, BlockHitResult p_316877_) {
++            var fromEvent = net.neoforged.neoforge.event.EventHooks.onActivateBlock(p_316374_, p_316651_, p_316623_, p_316469_, p_316877_);
++            if (fromEvent != null) return fromEvent;
+             return this.getBlock().useItemOn(p_316374_, this.asState(), p_316651_, p_316877_.getBlockPos(), p_316623_, p_316469_, p_316877_);
+         }
+ 
+         public InteractionResult useWithoutItem(Level p_316368_, Player p_316500_, BlockHitResult p_316346_) {
++            var fromEvent = net.neoforged.neoforge.event.EventHooks.onUseBlockWithoutItem(p_316368_, p_316500_, p_316346_);
++            if (fromEvent != null) return fromEvent;
+             return this.getBlock().useWithoutItem(this.asState(), p_316368_, p_316346_.getBlockPos(), p_316500_, p_316346_);
+         }
+ 
 @@ -824,6 +_,7 @@
              return this.getBlock().getSeed(this.asState(), p_60727_);
          }
