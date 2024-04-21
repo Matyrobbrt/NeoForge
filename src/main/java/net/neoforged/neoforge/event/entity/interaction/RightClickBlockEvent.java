@@ -166,8 +166,10 @@ public sealed abstract class RightClickBlockEvent extends Event implements ICanc
         @Override
         @Deprecated
         public void setCanceled(boolean canceled) {
-            if (canceled && interactionResult != null) {
+            if (canceled && interactionResult == null) {
                 interactionResult = InteractionResult.PASS;
+            } else if (!canceled) {
+                interactionResult = null;
             }
             super.setCanceled(canceled);
         }
@@ -320,8 +322,10 @@ public sealed abstract class RightClickBlockEvent extends Event implements ICanc
         @Override
         @Deprecated
         public void setCanceled(boolean canceled) {
-            if (canceled && interactionResult != null) {
+            if (canceled && interactionResult == null) {
                 interactionResult = ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
+            } else if (!canceled) {
+                interactionResult = null;
             }
             super.setCanceled(canceled);
         }
@@ -425,8 +429,10 @@ public sealed abstract class RightClickBlockEvent extends Event implements ICanc
         @Override
         @Deprecated
         public void setCanceled(boolean canceled) {
-            if (canceled && interactionResult != null) {
+            if (canceled && interactionResult == null) {
                 interactionResult = InteractionResult.PASS;
+            } else if (!canceled) {
+                interactionResult = null;
             }
             super.setCanceled(canceled);
         }
@@ -519,8 +525,10 @@ public sealed abstract class RightClickBlockEvent extends Event implements ICanc
         @Override
         @Deprecated
         public void setCanceled(boolean canceled) {
-            if (canceled && interactionResult != null) {
+            if (canceled && interactionResult == null) {
                 interactionResult = InteractionResult.PASS;
+            } else if (!canceled) {
+                interactionResult = null;
             }
             super.setCanceled(canceled);
         }

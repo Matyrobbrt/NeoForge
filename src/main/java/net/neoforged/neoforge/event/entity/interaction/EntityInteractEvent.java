@@ -139,8 +139,10 @@ public class EntityInteractEvent extends Event implements ICancellableEvent {
     @Override
     @Deprecated
     public void setCanceled(boolean canceled) {
-        if (canceled && interactionResult != null) {
+        if (canceled && interactionResult == null) {
             interactionResult = InteractionResult.PASS;
+        } else if (!canceled) {
+            interactionResult = null;
         }
         ICancellableEvent.super.setCanceled(canceled);
     }

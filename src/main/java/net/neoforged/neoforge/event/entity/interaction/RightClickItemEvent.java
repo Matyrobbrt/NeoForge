@@ -104,7 +104,7 @@ public class RightClickItemEvent extends PlayerEvent implements ICancellableEven
     @Override
     @Deprecated
     public void setCanceled(boolean canceled) {
-        if (canceled && interactionResult != null) {
+        if (canceled && interactionResult == null) {
             interactionResult = InteractionResultHolder.pass(getUseStack());
         } else if (!canceled) {
             interactionResult = null;
