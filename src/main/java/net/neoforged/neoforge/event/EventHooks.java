@@ -112,7 +112,8 @@ import net.neoforged.neoforge.event.entity.EntityMountEvent;
 import net.neoforged.neoforge.event.entity.EntityStruckByLightningEvent;
 import net.neoforged.neoforge.event.entity.EntityTeleportEvent;
 import net.neoforged.neoforge.event.entity.ProjectileImpactEvent;
-import net.neoforged.neoforge.event.entity.RightClickBlockEvent;
+import net.neoforged.neoforge.event.entity.interaction.EntityInteractEvent;
+import net.neoforged.neoforge.event.entity.interaction.RightClickBlockEvent;
 import net.neoforged.neoforge.event.entity.item.ItemExpireEvent;
 import net.neoforged.neoforge.event.entity.living.AnimalTameEvent;
 import net.neoforged.neoforge.event.entity.living.LivingConversionEvent;
@@ -424,6 +425,13 @@ public class EventHooks {
     @Nullable
     public static InteractionResult onUseItemOnBlock(UseOnContext context) {
         var event = new RightClickBlockEvent.UseItemOnBlock(context);
+        NeoForge.EVENT_BUS.post(event);
+        return event.isCanceled() ? event.getInteractionResult() : null;
+    }
+
+    @Nullable
+    public static InteractionResult onEntityInteract(Player player, Entity entity, InteractionHand hand, Vec3 hitVec) {
+        var event = new EntityInteractEvent(player, entity, hand, hitVec);
         NeoForge.EVENT_BUS.post(event);
         return event.isCanceled() ? event.getInteractionResult() : null;
     }

@@ -28,3 +28,15 @@
      }
  
      private void ensureHasSentCarriedItem() {
+@@ -402,7 +_,10 @@
+         this.ensureHasSentCarriedItem();
+         Vec3 vec3 = p_105233_.getLocation().subtract(p_105232_.getX(), p_105232_.getY(), p_105232_.getZ());
+         this.connection.send(ServerboundInteractPacket.createInteractionPacket(p_105232_, p_105231_.isShiftKeyDown(), p_105234_, vec3));
+-        return this.localPlayerMode == GameType.SPECTATOR ? InteractionResult.PASS : p_105232_.interactAt(p_105231_, vec3, p_105234_);
++        if (this.localPlayerMode == GameType.SPECTATOR) return InteractionResult.PASS;
++        var fromEvent = net.neoforged.neoforge.event.EventHooks.onEntityInteract(p_105231_, p_105231_, p_105234_, vec3);
++        if (fromEvent != null) return fromEvent;
++        return p_105232_.interactAt(p_105231_, vec3, p_105234_);
+     }
+ 
+     public void handleInventoryMouseClick(int p_171800_, int p_171801_, int p_171802_, ClickType p_171803_, Player p_171804_) {

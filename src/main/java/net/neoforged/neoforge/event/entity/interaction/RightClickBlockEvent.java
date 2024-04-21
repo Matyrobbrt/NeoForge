@@ -1,4 +1,4 @@
-package net.neoforged.neoforge.event.entity;
+package net.neoforged.neoforge.event.entity.interaction;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -169,7 +169,7 @@ public sealed abstract class RightClickBlockEvent extends Event implements ICanc
             if (canceled && interactionResult != null) {
                 interactionResult = InteractionResult.PASS;
             }
-            super.setCanceled(true);
+            super.setCanceled(canceled);
         }
     }
 
@@ -323,7 +323,7 @@ public sealed abstract class RightClickBlockEvent extends Event implements ICanc
             if (canceled && interactionResult != null) {
                 interactionResult = ItemInteractionResult.SKIP_DEFAULT_BLOCK_INTERACTION;
             }
-            super.setCanceled(true);
+            super.setCanceled(canceled);
         }
     }
 
@@ -428,7 +428,7 @@ public sealed abstract class RightClickBlockEvent extends Event implements ICanc
             if (canceled && interactionResult != null) {
                 interactionResult = InteractionResult.PASS;
             }
-            super.setCanceled(true);
+            super.setCanceled(canceled);
         }
     }
 
@@ -522,7 +522,7 @@ public sealed abstract class RightClickBlockEvent extends Event implements ICanc
             if (canceled && interactionResult != null) {
                 interactionResult = InteractionResult.PASS;
             }
-            super.setCanceled(true);
+            super.setCanceled(canceled);
         }
     }
 
