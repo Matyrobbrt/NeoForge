@@ -19,6 +19,15 @@
                      if (flag) {
                          block.destroy(level, p_105268_, blockstate);
                      }
+@@ -215,7 +_,7 @@
+             } else {
+                 this.destroyProgress = this.destroyProgress + blockstate.getDestroyProgress(this.minecraft.player, this.minecraft.player.level(), p_105284_);
+                 if (this.destroyTicks % 4.0F == 0.0F) {
+-                    SoundType soundtype = blockstate.getSoundType();
++                    SoundType soundtype = blockstate.getSoundType(this.minecraft.level, p_105284_, this.minecraft.player);
+                     this.minecraft
+                         .getSoundManager()
+                         .play(
 @@ -270,7 +_,7 @@
  
      private boolean sameDestroyTarget(BlockPos p_105282_) {
