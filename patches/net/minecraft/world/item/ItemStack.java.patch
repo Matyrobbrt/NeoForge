@@ -29,10 +29,12 @@
      }
  
      public boolean is(HolderSet<Item> p_298683_) {
-@@ -339,13 +_,24 @@
+@@ -339,13 +_,26 @@
      }
  
      public InteractionResult useOn(UseOnContext p_41662_) {
++        var fromEvent = net.neoforged.neoforge.event.EventHooks.onUseItemOnBlock(p_41662_);
++        if (fromEvent != null) return fromEvent;
 +        if (!p_41662_.getLevel().isClientSide) return net.neoforged.neoforge.common.CommonHooks.onPlaceItemIntoWorld(p_41662_);
 +        return onItemUse(p_41662_, (c) -> getItem().useOn(p_41662_));
 +    }

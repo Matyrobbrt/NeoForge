@@ -401,15 +401,15 @@ public class EventHooks {
     }
 
     @Nullable
-    public static ItemInteractionResult onActivateBlock(ItemStack stack, Level level, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        var event = new RightClickBlockEvent.ActivateBlock(player, level, hitResult, hand, stack);
+    public static InteractionResult onUseItem(UseOnContext context) {
+        var event = new RightClickBlockEvent.UseItem(context);
         NeoForge.EVENT_BUS.post(event);
         return event.isCanceled() ? event.getInteractionResult() : null;
     }
 
     @Nullable
-    public static InteractionResult onUseItem(UseOnContext context) {
-        var event = new RightClickBlockEvent.UseItem(context);
+    public static ItemInteractionResult onActivateBlock(ItemStack stack, Level level, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        var event = new RightClickBlockEvent.ActivateBlock(player, level, hitResult, hand, stack);
         NeoForge.EVENT_BUS.post(event);
         return event.isCanceled() ? event.getInteractionResult() : null;
     }
@@ -420,6 +420,14 @@ public class EventHooks {
         NeoForge.EVENT_BUS.post(event);
         return event.isCanceled() ? event.getInteractionResult() : null;
     }
+
+    @Nullable
+    public static InteractionResult onUseItemOnBlock(UseOnContext context) {
+        var event = new RightClickBlockEvent.UseItemOnBlock(context);
+        NeoForge.EVENT_BUS.post(event);
+        return event.isCanceled() ? event.getInteractionResult() : null;
+    }
+
 
     public static void onStartEntityTracking(Entity entity, Player player) {
         NeoForge.EVENT_BUS.post(new PlayerEvent.StartTracking(player, entity));

@@ -18,6 +18,17 @@ import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 
+/**
+ * A parent class for events in the right click block pipeline.
+ * <p>
+ * The order of events and methods is as follows:
+ * <ul>
+ *     <li>{@link UseItem} before {@link Item#onItemUseFirst(ItemStack, UseOnContext)} - item-dictated interaction on the block</li>
+ *     <li>{@link ActivateBlock} before {@link Block#useItemOn(ItemStack, BlockState, Level, BlockPos, Player, InteractionHand, BlockHitResult)} - block-dictated interaction</li>
+ *     <li>{@link UseBlockWithoutItem} before {@link Block#useWithoutItem(BlockState, Level, BlockPos, Player, BlockHitResult)} - item-less block-dictated interaction</li>
+ *     <li>{@link UseItemOnBlock} before {@link Item#useOn(UseOnContext)} - item-dictated interactions that are after block activation</li>
+ * </ul>
+ */
 public sealed abstract class RightClickBlockEvent extends Event implements ICancellableEvent {
 
     /**
@@ -407,6 +418,100 @@ public sealed abstract class RightClickBlockEvent extends Event implements ICanc
         /**
          * Cancel this event. If the {@link #setInteractionResult result} is not changed, it will default to
          * {@link InteractionResult#PASS}, preventing only {@link Block#useWithoutItem(BlockState, Level, BlockPos, Player, BlockHitResult)} from being called.
+         *
+         * @param canceled whether this event should be cancelled
+         * @deprecated Use {@link #setInteractionResult(InteractionResult)} or similar methods instead, to set the result too.
+         */
+        @Override
+        @Deprecated
+        public void setCanceled(boolean canceled) {
+            if (canceled && interactionResult != null) {
+                interactionResult = InteractionResult.PASS;
+            }
+            super.setCanceled(true);
+        }
+    }
+
+    /**
+     * The last event in the right click pipeline, when the item is used on the block.
+     * This event is fired before {@link Item#useOn(UseOnContext)}.
+     * <p>
+     * Cancellation of this event will prevent {@link Item#useOn(UseOnContext)} from being called. If cancelled with {@link InteractionResult#PASS}, the pipeline
+     * will continue to block-less interactions: {@link Item#use(Level, Player, InteractionHand)}.
+     */
+    public static final class UseItemOnBlock extends WithResult {
+        private final UseOnContext context;
+
+        @ApiStatus.Internal
+        public UseItemOnBlock(UseOnContext context) {
+            this.context = context;
+        }
+
+        /**
+         * {@return the use context}
+         */
+        public UseOnContext getContext() {
+            return context;
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public Level getLevel() {
+            return context.getLevel();
+        }
+
+        /**
+         * {@inheritDoc}
+         */
+        @Override
+        public BlockPos getClickedPos() {
+            return context.getClickedPos();
+        }
+
+        /**
+         * Cancel this interaction, as a success. Any subsequent interactions will be aborted, but the {@link net.minecraft.advancements.CriteriaTriggers#ANY_BLOCK_USE block use trigger} will be invoked,
+         * and a client-side swing will be triggered.
+         *
+         * @param awardStat whether to award the {@link net.minecraft.stats.Stats#ITEM_USED item used} stat
+         * @see InteractionResult#sidedSuccess(boolean)
+         */
+        public void cancelWithSwing(boolean awardStat) {
+            setInteractionResult(awardStat ? InteractionResult.sidedSuccess(context.getLevel().isClientSide) : (context.getLevel().isClientSide ? InteractionResult.SUCCESS_NO_ITEM_USED : InteractionResult.CONSUME_PARTIAL));
+        }
+
+        /**
+         * Consume this interaction. Any subsequent interactions will be aborted, but the {@link net.minecraft.advancements.CriteriaTriggers#ANY_BLOCK_USE block use trigger} will be invoked.
+         *
+         * @param awardStat whether to award the {@link net.minecraft.stats.Stats#ITEM_USED item used} stat
+         * @see InteractionResult#CONSUME
+         */
+        public void consume(boolean awardStat) {
+            setInteractionResult(awardStat ? InteractionResult.CONSUME : InteractionResult.CONSUME_PARTIAL);
+        }
+
+        /**
+         * Fail this interaction. Any subsequent interactions will be aborted.
+         * @see InteractionResult#FAIL
+         */
+        public void fail() {
+            setInteractionResult(InteractionResult.FAIL);
+        }
+
+        /**
+         * Cancels this event, preventing {@link Item#useOn(UseOnContext)} from being called,
+         * but allowing the interaction to continue to block-less use ({@link Item#use(Level, Player, InteractionHand)}).
+         *
+         * @see InteractionResult#PASS
+         */
+        public void pass() {
+            setInteractionResult(InteractionResult.PASS);
+        }
+
+        /**
+         * Cancel this event. If the {@link #setInteractionResult result} is not changed, it will default to
+         * {@link InteractionResult#PASS}, preventing only {@link Item#useOn(UseOnContext)} from being called.
          *
          * @param canceled whether this event should be cancelled
          * @deprecated Use {@link #setInteractionResult(InteractionResult)} or similar methods instead, to set the result too.
