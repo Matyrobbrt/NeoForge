@@ -45,4 +45,5 @@ jobs:
                 method: 'POST'
                 username: ${{ secrets.USER }}
                 password: ${{ secrets.PASS }}
+                customHeaders: '{"X-Generate-Checksums": "true"}'
                 file: ${{ github.workspace }}/projects/neoforge/build/libs/neoforge-${{ inputs.version }}-installer.jar
