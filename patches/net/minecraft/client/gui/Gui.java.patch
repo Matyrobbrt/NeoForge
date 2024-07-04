@@ -270,20 +270,16 @@
 +        renderAirLevel(guiGraphics);
 +    }
 +
-+    private void renderHealthLevel(GuiGraphics p_283143_) {
++    private void renderHealthLevel(GuiGraphics guiGraphics) {
          Player player = this.getCameraPlayer();
          if (player != null) {
              int i = Mth.ceil(player.getHealth());
-@@ -801,50 +_,78 @@
-             this.lastHealth = i;
-             int k = this.displayHealth;
+@@ -803,35 +_,62 @@
              this.random.setSeed((long)(this.tickCount * 312871));
--            int l = guiGraphics.guiWidth() / 2 - 91;
--            int i1 = guiGraphics.guiWidth() / 2 + 91;
+             int l = guiGraphics.guiWidth() / 2 - 91;
+             int i1 = guiGraphics.guiWidth() / 2 + 91;
 -            int j1 = guiGraphics.guiHeight() - 39;
-+            int l = p_283143_.guiWidth() / 2 - 91;
-+            int i1 = p_283143_.guiWidth() / 2 + 91;
-+            int j1 = p_283143_.guiHeight() - leftHeight;
++            int j1 = guiGraphics.guiHeight() - leftHeight;
              float f = Math.max((float)player.getAttributeValue(Attributes.MAX_HEALTH), (float)Math.max(k, i));
              int k1 = Mth.ceil(player.getAbsorptionAmount());
              int l1 = Mth.ceil((f + (float)k1) / 2.0F / 10.0F);
@@ -294,21 +290,22 @@
              if (player.hasEffect(MobEffects.REGENERATION)) {
                  k2 = this.tickCount % Mth.ceil(f + 5.0F);
              }
+-
+-            this.minecraft.getProfiler().push("armor");
+-            renderArmor(guiGraphics, player, j1, l1, i2, l);
+-            this.minecraft.getProfiler().popPush("health");
 +            this.minecraft.getProfiler().push("health");
-+            this.renderHearts(p_283143_, player, l, j1, i2, k2, f, i, k, k1, flag);
+             this.renderHearts(guiGraphics, player, l, j1, i2, k2, f, i, k, k1, flag);
 +            this.minecraft.getProfiler().pop();
 +        }
 +    }
- 
-+    private void renderArmorLevel(GuiGraphics p_283143_) {
++
++    private void renderArmorLevel(GuiGraphics guiGraphics) {
 +        Player player = this.getCameraPlayer();
 +        if (player != null) {
-+            int l = p_283143_.guiWidth() / 2 - 91;
-             this.minecraft.getProfiler().push("armor");
--            renderArmor(guiGraphics, player, j1, l1, i2, l);
--            this.minecraft.getProfiler().popPush("health");
--            this.renderHearts(guiGraphics, player, l, j1, i2, k2, f, i, k, k1, flag);
-+            renderArmor(p_283143_, player, p_283143_.guiHeight() - leftHeight + 10, 1, 0, l);
++            int l = guiGraphics.guiWidth() / 2 - 91;
++            this.minecraft.getProfiler().push("armor");
++            renderArmor(guiGraphics, player, guiGraphics.guiHeight() - leftHeight + 10, 1, 0, l);
 +            this.minecraft.getProfiler().pop();
 +            if (player.getArmorValue() > 0) {
 +                leftHeight += 10;
@@ -316,19 +313,18 @@
 +        }
 +    }
 +
-+    private void renderFoodLevel(GuiGraphics p_283143_) {
++    private void renderFoodLevel(GuiGraphics guiGraphics) {
 +        Player player = this.getCameraPlayer();
 +        if (player != null) {
              LivingEntity livingentity = this.getPlayerVehicleWithHealth();
              int l2 = this.getVehicleMaxHearts(livingentity);
              if (l2 == 0) {
 -                this.minecraft.getProfiler().popPush("food");
--                this.renderFood(guiGraphics, player, j1, i1);
--                j2 -= 10;
 +                this.minecraft.getProfiler().push("food");
-+                int i1 = p_283143_.guiWidth() / 2 + 91;
-+                int j1 = p_283143_.guiHeight() - rightHeight;
-+                this.renderFood(p_283143_, player, j1, i1);
++                int i1 = guiGraphics.guiWidth() / 2 + 91;
++                int j1 = guiGraphics.guiHeight() - rightHeight;
+                 this.renderFood(guiGraphics, player, j1, i1);
+-                j2 -= 10;
 +                rightHeight += 10;
 +                this.minecraft.getProfiler().pop();
              }
@@ -337,10 +333,10 @@
 +        }
 +    }
 +
-+    private void renderAirLevel(GuiGraphics p_283143_) {
++    private void renderAirLevel(GuiGraphics guiGraphics) {
 +        Player player = this.getCameraPlayer();
 +        if (player != null) {
-+            int i1 = p_283143_.guiWidth() / 2 + 91;
++            int i1 = guiGraphics.guiWidth() / 2 + 91;
 +
 +            this.minecraft.getProfiler().push("air");
              int i3 = player.getMaxAirSupply();
@@ -348,19 +344,11 @@
              if (player.isEyeInFluid(FluidTags.WATER) || j3 < i3) {
 -                int k3 = this.getVisibleVehicleHeartRows(l2) - 1;
 -                j2 -= k3 * 10;
-+                int j2 = p_283143_.guiHeight() - rightHeight;
++                int j2 = guiGraphics.guiHeight() - rightHeight;
                  int l3 = Mth.ceil((double)(j3 - 2) * 10.0 / (double)i3);
                  int i4 = Mth.ceil((double)j3 * 10.0 / (double)i3) - l3;
                  RenderSystem.enableBlend();
- 
-                 for (int j4 = 0; j4 < l3 + i4; j4++) {
-                     if (j4 < l3) {
--                        guiGraphics.blitSprite(AIR_SPRITE, i1 - j4 * 8 - 9, j2, 9, 9);
-+                        p_283143_.blitSprite(AIR_SPRITE, i1 - j4 * 8 - 9, j2, 9, 9);
-                     } else {
--                        guiGraphics.blitSprite(AIR_BURSTING_SPRITE, i1 - j4 * 8 - 9, j2, 9, 9);
-+                        p_283143_.blitSprite(AIR_BURSTING_SPRITE, i1 - j4 * 8 - 9, j2, 9, 9);
-                     }
+@@ -845,6 +_,7 @@
                  }
  
                  RenderSystem.disableBlend();

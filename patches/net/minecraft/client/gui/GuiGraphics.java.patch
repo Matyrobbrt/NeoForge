@@ -9,65 +9,30 @@
      public static final float MAX_GUI_Z = 10000.0F;
      public static final float MIN_GUI_Z = -10000.0F;
      private static final int EXTRA_SPACE_AFTER_FIRST_TOOLTIP_LINE = 2;
-@@ -268,21 +_,26 @@
+@@ -268,6 +_,11 @@
      }
  
      public int drawString(Font font, @Nullable String text, int x, int y, int color, boolean dropShadow) {
--        if (text == null) {
 +        return this.drawString(font, text, (float)x, (float)y, color, dropShadow);
 +    }
 +
 +    // Forge: Add float variant for x,y coordinates, with a string as input
-+    public int drawString(Font p_283343_, @Nullable String p_281896_, float p_283569_, float p_283418_, int p_281560_, boolean p_282130_) {
-+        if (p_281896_ == null) {
++    public int drawString(Font font, @Nullable String text, float x, float y, int color, boolean dropShadow) {
+         if (text == null) {
              return 0;
          } else {
--            int i = font.drawInBatch(
--                text,
--                (float)x,
--                (float)y,
--                color,
--                dropShadow,
-+            int i = p_283343_.drawInBatch(
-+                p_281896_,
-+                (float)p_283569_,
-+                (float)p_283418_,
-+                p_281560_,
-+                p_282130_,
-                 this.pose.last().pose(),
-                 this.bufferSource,
-                 Font.DisplayMode.NORMAL,
-                 0,
-                 15728880,
--                font.isBidirectional()
-+                p_283343_.isBidirectional()
-             );
-             this.flushIfUnmanaged();
-             return i;
-@@ -294,12 +_,17 @@
+@@ -294,6 +_,11 @@
      }
  
      public int drawString(Font font, FormattedCharSequence text, int x, int y, int color, boolean dropShadow) {
--        int i = font.drawInBatch(
--            text,
--            (float)x,
--            (float)y,
--            color,
--            dropShadow,
 +        return this.drawString(font, text, (float)x, (float)y, color, dropShadow);
 +    }
 +
 +    // Forge: Add float variant for x,y coordinates, with a formatted char sequence as input
-+    public int drawString(Font p_282636_, FormattedCharSequence p_281596_, float p_281586_, float p_282816_, int p_281743_, boolean p_282394_) {
-+        int i = p_282636_.drawInBatch(
-+            p_281596_,
-+            (float)p_281586_,
-+            (float)p_282816_,
-+            p_281743_,
-+            p_282394_,
-             this.pose.last().pose(),
-             this.bufferSource,
-             Font.DisplayMode.NORMAL,
++    public int drawString(Font font, FormattedCharSequence text, float x, float y, int color, boolean dropShadow) {
+         int i = font.drawInBatch(
+             text,
+             (float)x,
 @@ -873,19 +_,26 @@
              }
  

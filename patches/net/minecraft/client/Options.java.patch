@@ -29,7 +29,7 @@
          this.minecraft = minecraft;
          this.optionsFile = new File(gameDirectory, "options.txt");
          boolean flag = Runtime.getRuntime().maxMemory() >= 1000000000L;
-@@ -1236,21 +_,31 @@
+@@ -1236,11 +_,21 @@
          this.onboardAccessibility = accessor.process("onboardAccessibility", this.onboardAccessibility);
          accessor.process("menuBackgroundBlurriness", this.menuBackgroundBlurriness);
  
@@ -37,13 +37,12 @@
 +        processOptionsForge(accessor);
 +    }
 +    // FORGE: split off to allow reloading options after mod loading is done
-+    private void processOptionsForge(Options.FieldAccess p_168428_)
++    private void processOptionsForge(Options.FieldAccess accessor)
 +    {
          for (KeyMapping keymapping : this.keyMappings) {
 -            String s = keymapping.saveString();
--            String s1 = accessor.process("key_" + keymapping.getName(), s);
 +            String s = keymapping.saveString() + (keymapping.getKeyModifier() != net.neoforged.neoforge.client.settings.KeyModifier.NONE ? ":" + keymapping.getKeyModifier() : "");
-+            String s1 = p_168428_.process("key_" + keymapping.getName(), s);
+             String s1 = accessor.process("key_" + keymapping.getName(), s);
              if (!s.equals(s1)) {
 -                keymapping.setKey(InputConstants.getKey(s1));
 +                if (s1.indexOf(':') != -1) {
@@ -54,18 +53,6 @@
              }
          }
  
-         for (SoundSource soundsource : SoundSource.values()) {
--            accessor.process("soundCategory_" + soundsource.getName(), this.soundSourceVolumes.get(soundsource));
-+            p_168428_.process("soundCategory_" + soundsource.getName(), this.soundSourceVolumes.get(soundsource));
-         }
- 
-         for (PlayerModelPart playermodelpart : PlayerModelPart.values()) {
-             boolean flag = this.modelParts.contains(playermodelpart);
--            boolean flag1 = accessor.process("modelPart_" + playermodelpart.getId(), flag);
-+            boolean flag1 = p_168428_.process("modelPart_" + playermodelpart.getId(), flag);
-             if (flag1 != flag) {
-                 this.setModelPart(playermodelpart, flag1);
-             }
 @@ -1258,6 +_,9 @@
      }
  
