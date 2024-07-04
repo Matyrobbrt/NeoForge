@@ -39,16 +39,6 @@ allprojects {
     repositories {
         mavenLocal()
     }
-    repositories {
-        maven {
-            name 'Maven for PR #32' // https://github.com/neoforged/JavaSourceTransformer/pull/32
-            url 'https://prmaven.neoforged.net/JavaSourceTransformer/pr32'
-            content {
-                includeModule('net.neoforged.jst', 'jst-cli')
-                includeModule('net.neoforged.jst', 'jst-cli-bundle')
-            }
-        }
-    }
 }
 
 subprojects {
