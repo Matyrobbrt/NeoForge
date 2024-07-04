@@ -1,50 +1,21 @@
 --- a/net/minecraft/world/level/entity/PersistentEntitySectionManager.java
 +++ b/net/minecraft/world/level/entity/PersistentEntitySectionManager.java
-@@ -71,25 +_,34 @@
-         return this.addEntity(entity, false);
+@@ -72,6 +_,15 @@
      }
  
--    private boolean addEntity(T entity, boolean worldGenSpawned) {
--        if (!this.addEntityUuid(entity)) {
+     private boolean addEntity(T entity, boolean worldGenSpawned) {
++        if (entity instanceof Entity p_entity && net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.entity.EntityJoinLevelEvent(p_entity, p_entity.level(), worldGenSpawned)).isCanceled()) return false;
++        return addEntityWithoutEvent(entity, worldGenSpawned);
++    }
++
 +    public boolean addNewEntityWithoutEvent(T entity) {
 +        return this.addEntityWithoutEvent(entity, false);
 +    }
 +
-+    private boolean addEntity(T p_entity, boolean worldGenSpawned) {
-+        if (p_entity instanceof Entity entity && net.neoforged.neoforge.common.NeoForge.EVENT_BUS.post(new net.neoforged.neoforge.event.entity.EntityJoinLevelEvent(entity, entity.level(), worldGenSpawned)).isCanceled()) return false;
-+        return addEntityWithoutEvent(p_entity, worldGenSpawned);
-+    }
-+
-+    private boolean addEntityWithoutEvent(T p_157539_, boolean p_157540_) {
-+        if (!this.addEntityUuid(p_157539_)) {
++    private boolean addEntityWithoutEvent(T entity, boolean worldGenSpawned) {
+         if (!this.addEntityUuid(entity)) {
              return false;
          } else {
--            long i = SectionPos.asLong(entity.blockPosition());
-+            long i = SectionPos.asLong(p_157539_.blockPosition());
-             EntitySection<T> entitysection = this.sectionStorage.getOrCreateSection(i);
--            entitysection.add(entity);
--            entity.setLevelCallback(new PersistentEntitySectionManager.Callback(entity, i, entitysection));
--            if (!worldGenSpawned) {
--                this.callbacks.onCreated(entity);
-+            entitysection.add(p_157539_);
-+            p_157539_.setLevelCallback(new PersistentEntitySectionManager.Callback(p_157539_, i, entitysection));
-+            if (!p_157540_) {
-+                this.callbacks.onCreated(p_157539_);
-             }
- 
--            Visibility visibility = getEffectiveStatus(entity, entitysection.getStatus());
-+            Visibility visibility = getEffectiveStatus(p_157539_, entitysection.getStatus());
-             if (visibility.isAccessible()) {
--                this.startTracking(entity);
-+                this.startTracking(p_157539_);
-             }
- 
-             if (visibility.isTicking()) {
--                this.startTicking(entity);
-+                this.startTicking(p_157539_);
-             }
- 
-             return true;
 @@ -101,11 +_,17 @@
      }
  
