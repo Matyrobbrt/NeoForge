@@ -1,19 +1,23 @@
 --- a/net/minecraft/world/item/MapItem.java
 +++ b/net/minecraft/world/item/MapItem.java
-@@ -57,6 +_,16 @@
+@@ -57,8 +_,18 @@
  
      @Nullable
-     public static MapItemSavedData getSavedData(ItemStack p_42854_, Level p_42855_) {
+     public static MapItemSavedData getSavedData(ItemStack stack, Level level) {
+-        MapId mapid = stack.get(DataComponents.MAP_ID);
+-        return getSavedData(mapid, level);
 +        // Neo: Add instance method so that mods can override
-+        Item map = p_42854_.getItem();
++        Item map = stack.getItem();
 +        if(map instanceof MapItem) {
-+            return ((MapItem)map).getCustomMapData(p_42854_, p_42855_);
++            return ((MapItem)map).getCustomMapData(stack, level);
 +        }
 +        return null;
 +    }
 +
 +    @Nullable
 +    protected MapItemSavedData getCustomMapData(ItemStack p_42854_, Level p_42855_) {
-         MapId mapid = p_42854_.get(DataComponents.MAP_ID);
-         return getSavedData(mapid, p_42855_);
++        MapId mapid = p_42854_.get(DataComponents.MAP_ID);
++        return getSavedData(mapid, p_42855_);
      }
+ 
+     private static MapId createNewSavedData(

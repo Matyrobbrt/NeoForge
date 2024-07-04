@@ -1,32 +1,52 @@
 --- a/net/minecraft/client/renderer/ShaderInstance.java
 +++ b/net/minecraft/client/renderer/ShaderInstance.java
-@@ -94,10 +_,14 @@
+@@ -94,12 +_,16 @@
      @Nullable
      public final Uniform CHUNK_OFFSET;
  
 +    @Deprecated // FORGE: Use the ResourceLocation variant below
-     public ShaderInstance(ResourceProvider p_173336_, String p_173337_, VertexFormat p_173338_) throws IOException {
--        this.name = p_173337_;
-+        this(p_173336_, ResourceLocation.parse(p_173337_), p_173338_);
+     public ShaderInstance(ResourceProvider resourceProvider, String name, VertexFormat vertexFormat) throws IOException {
+-        this.name = name;
+-        this.vertexFormat = vertexFormat;
+-        ResourceLocation resourcelocation = ResourceLocation.withDefaultNamespace("shaders/core/" + name + ".json");
++        this(resourceProvider, ResourceLocation.parse(name), vertexFormat);
 +    }
 +    public ShaderInstance(ResourceProvider p_173336_, ResourceLocation shaderLocation, VertexFormat p_173338_) throws IOException {
 +        this.name = shaderLocation.getNamespace().equals("minecraft") ? shaderLocation.getPath() : shaderLocation.toString();
-         this.vertexFormat = p_173338_;
--        ResourceLocation resourcelocation = ResourceLocation.withDefaultNamespace("shaders/core/" + p_173337_ + ".json");
++        this.vertexFormat = p_173338_;
 +        ResourceLocation resourcelocation = ResourceLocation.fromNamespaceAndPath(shaderLocation.getNamespace(), "shaders/core/" + shaderLocation.getPath() + ".json");
  
-         try (Reader reader = p_173336_.openAsReader(resourcelocation)) {
+-        try (Reader reader = resourceProvider.openAsReader(resourcelocation)) {
++        try (Reader reader = p_173336_.openAsReader(resourcelocation)) {
              JsonObject jsonobject = GsonHelper.parse(reader);
+             String s1 = GsonHelper.getAsString(jsonobject, "vertex");
+             String s = GsonHelper.getAsString(jsonobject, "fragment");
+@@ -137,12 +_,12 @@
+                 }
+             }
+ 
+-            this.vertexProgram = getOrCreate(resourceProvider, Program.Type.VERTEX, s1);
+-            this.fragmentProgram = getOrCreate(resourceProvider, Program.Type.FRAGMENT, s);
++            this.vertexProgram = getOrCreate(p_173336_, Program.Type.VERTEX, s1);
++            this.fragmentProgram = getOrCreate(p_173336_, Program.Type.FRAGMENT, s);
+             this.programId = ProgramManager.createProgram();
+             int k = 0;
+ 
+-            for (String s2 : vertexFormat.getElementAttributeNames()) {
++            for (String s2 : p_173338_.getElementAttributeNames()) {
+                 Uniform.glBindAttribLocation(this.programId, k, s2);
+                 k++;
+             }
 @@ -177,8 +_,10 @@
-         Program program1 = p_173342_.getPrograms().get(p_173343_);
+         Program program1 = programType.getPrograms().get(name);
          Program program;
          if (program1 == null) {
--            String s = "shaders/core/" + p_173343_ + p_173342_.getExtension();
--            Resource resource = p_173341_.getResourceOrThrow(ResourceLocation.withDefaultNamespace(s));
-+            ResourceLocation loc = ResourceLocation.parse(p_173343_);
-+            String s = "shaders/core/" + loc.getPath() + p_173342_.getExtension();
+-            String s = "shaders/core/" + name + programType.getExtension();
+-            Resource resource = resourceProvider.getResourceOrThrow(ResourceLocation.withDefaultNamespace(s));
++            ResourceLocation loc = ResourceLocation.parse(name);
++            String s = "shaders/core/" + loc.getPath() + programType.getExtension();
 +            ResourceLocation resourcelocation = ResourceLocation.fromNamespaceAndPath(loc.getNamespace(), s);
-+            Resource resource = p_173341_.getResourceOrThrow(resourcelocation);
++            Resource resource = resourceProvider.getResourceOrThrow(resourcelocation);
  
              try (InputStream inputstream = resource.open()) {
                  final String s1 = FileUtil.getFullResourcePath(s);

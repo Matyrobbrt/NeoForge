@@ -1,7 +1,7 @@
 --- a/net/minecraft/advancements/critereon/ItemAttributeModifiersPredicate.java
 +++ b/net/minecraft/advancements/critereon/ItemAttributeModifiersPredicate.java
 @@ -40,6 +_,14 @@
-         return !this.modifiers.isPresent() || this.modifiers.get().test(p_341374_.modifiers());
+         return !this.modifiers.isPresent() || this.modifiers.get().test(value.modifiers());
      }
  
 +    /**

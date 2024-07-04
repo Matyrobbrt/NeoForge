@@ -60,8 +60,8 @@
  
      @Override
 @@ -125,7 +_,13 @@
-     public void handleConfigurationFinished(ServerboundFinishConfigurationPacket p_294283_) {
-         PacketUtils.ensureRunningOnSameThread(p_294283_, this, this.server);
+     public void handleConfigurationFinished(ServerboundFinishConfigurationPacket packet) {
+         PacketUtils.ensureRunningOnSameThread(packet, this, this.server);
          this.finishCurrentTask(JoinWorldTask.TYPE);
 -        this.connection.setupOutboundProtocol(GameProtocols.CLIENTBOUND_TEMPLATE.bind(RegistryFriendlyByteBuf.decorator(this.server.registryAccess())));
 +        this.connection.setupOutboundProtocol(GameProtocols.CLIENTBOUND_TEMPLATE.bind(RegistryFriendlyByteBuf.decorator(this.server.registryAccess(), this.connectionType)));

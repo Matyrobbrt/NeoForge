@@ -1,7 +1,7 @@
 --- a/net/minecraft/world/level/block/entity/BlockEntityType.java
 +++ b/net/minecraft/world/level/block/entity/BlockEntityType.java
 @@ -301,6 +_,11 @@
-         return this.validBlocks.contains(p_155263_.getBlock());
+         return this.validBlocks.contains(state.getBlock());
      }
  
 +    // Neo: Add block getter

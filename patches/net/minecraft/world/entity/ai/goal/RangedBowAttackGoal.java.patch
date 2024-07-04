@@ -9,17 +9,27 @@
      private final T mob;
      private final double speedModifier;
      private int attackIntervalMin;
-@@ -20,6 +_,10 @@
+@@ -20,11 +_,15 @@
      private boolean strafingBackwards;
      private int strafingTime = -1;
  
-+    public <M extends Monster & RangedAttackMob> RangedBowAttackGoal(M p_25792_, double p_25793_, int p_25794_, float p_25795_) {
-+        this((T) p_25792_, p_25793_, p_25794_, p_25795_);
+-    public RangedBowAttackGoal(T mob, double speedModifier, int attackIntervalMin, float attackRadius) {
+-        this.mob = mob;
+-        this.speedModifier = speedModifier;
+-        this.attackIntervalMin = attackIntervalMin;
+-        this.attackRadiusSqr = attackRadius * attackRadius;
++    public <M extends Monster & RangedAttackMob> RangedBowAttackGoal(M mob, double speedModifier, int attackIntervalMin, float attackRadius) {
++        this((T) mob, speedModifier, attackIntervalMin, attackRadius);
 +    }
 +
-     public RangedBowAttackGoal(T p_25792_, double p_25793_, int p_25794_, float p_25795_) {
-         this.mob = p_25792_;
-         this.speedModifier = p_25793_;
++    public RangedBowAttackGoal(T p_25792_, double p_25793_, int p_25794_, float p_25795_) {
++        this.mob = p_25792_;
++        this.speedModifier = p_25793_;
++        this.attackIntervalMin = p_25794_;
++        this.attackRadiusSqr = p_25795_ * p_25795_;
+         this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
+     }
+ 
 @@ -38,7 +_,7 @@
      }
  

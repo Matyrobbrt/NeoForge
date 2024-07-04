@@ -1,7 +1,7 @@
 --- a/net/minecraft/util/datafix/fixes/MobEffectIdFix.java
 +++ b/net/minecraft/util/datafix/fixes/MobEffectIdFix.java
 @@ -76,8 +_,20 @@
-         return updateMobEffectIdField(p_299001_, p_298420_, p_299001_, p_299179_);
+         return updateMobEffectIdField(dynamic, oldName, dynamic, newName);
      }
  
 +    private static <T> Dynamic<T> updateMobEffectIdFieldConsideringForge(Dynamic<T> p_298948_, String p_299234_, Dynamic<T> p_298832_, String p_298487_, String forgeFieldId) {
@@ -16,18 +16,18 @@
 +        return optional.isEmpty() ? dynamic : dynamic.set(s, optional.get());
 +    }
 +
-     private static <T> Dynamic<T> updateMobEffectInstance(Dynamic<T> p_298320_) {
--        p_298320_ = updateMobEffectIdField(p_298320_, "Id", "id");
-+        p_298320_ = updateMobEffectIdFieldConsideringForge(p_298320_, "Id", p_298320_, "id", "forge:id");
-         p_298320_ = p_298320_.renameField("Ambient", "ambient");
-         p_298320_ = p_298320_.renameField("Amplifier", "amplifier");
-         p_298320_ = p_298320_.renameField("Duration", "duration");
+     private static <T> Dynamic<T> updateMobEffectInstance(Dynamic<T> dynamic) {
+-        dynamic = updateMobEffectIdField(dynamic, "Id", "id");
++        dynamic = updateMobEffectIdFieldConsideringForge(dynamic, "Id", dynamic, "id", "forge:id");
+         dynamic = dynamic.renameField("Ambient", "ambient");
+         dynamic = dynamic.renameField("Amplifier", "amplifier");
+         dynamic = dynamic.renameField("Duration", "duration");
 @@ -96,7 +_,7 @@
      }
  
-     private static <T> Dynamic<T> updateSuspiciousStewEntry(Dynamic<T> p_298902_, Dynamic<T> p_299113_) {
--        p_299113_ = updateMobEffectIdField(p_298902_, "EffectId", p_299113_, "id");
-+        p_299113_ = updateMobEffectIdFieldConsideringForge(p_298902_, "EffectId", p_299113_, "id", "forge:effect_id");
-         Optional<Dynamic<T>> optional = p_298902_.get("EffectDuration").result();
-         return p_299113_.replaceField("EffectDuration", "duration", optional);
+     private static <T> Dynamic<T> updateSuspiciousStewEntry(Dynamic<T> oldDynamic, Dynamic<T> newDynamic) {
+-        newDynamic = updateMobEffectIdField(oldDynamic, "EffectId", newDynamic, "id");
++        newDynamic = updateMobEffectIdFieldConsideringForge(oldDynamic, "EffectId", newDynamic, "id", "forge:effect_id");
+         Optional<Dynamic<T>> optional = oldDynamic.get("EffectDuration").result();
+         return newDynamic.replaceField("EffectDuration", "duration", optional);
      }

@@ -1,22 +1,22 @@
 --- a/net/minecraft/world/item/SwordItem.java
 +++ b/net/minecraft/world/item/SwordItem.java
-@@ -21,11 +_,25 @@
-         super(p_43269_, p_43272_.component(DataComponents.TOOL, createToolProperties()));
+@@ -21,22 +_,36 @@
+         super(tier, properties.component(DataComponents.TOOL, createToolProperties()));
      }
  
 +    /**
 +     * Neo: Allow modded Swords to set exactly what Tool data component to use for their sword.
 +     */
-+    public SwordItem(Tier tier, Item.Properties properties, Tool toolComponentData) {
-+        super(tier, properties.component(DataComponents.TOOL, toolComponentData));
++    public SwordItem(Tier p_tier, Item.Properties p_properties, Tool toolComponentData) {
++        super(p_tier, p_properties.component(DataComponents.TOOL, toolComponentData));
 +    }
 +
      public static Tool createToolProperties() {
          return new Tool(List.of(Tool.Rule.minesAndDrops(List.of(Blocks.COBWEB), 15.0F), Tool.Rule.overrideSpeed(BlockTags.SWORD_EFFICIENT, 1.5F)), 1.0F, 2);
      }
  
-     public static ItemAttributeModifiers createAttributes(Tier p_330371_, int p_331976_, float p_332104_) {
-+        return createAttributes(p_330371_, (float)p_331976_, p_332104_);
+     public static ItemAttributeModifiers createAttributes(Tier tier, int attackDamage, float attackSpeed) {
++        return createAttributes(tier, (float)attackDamage, attackSpeed);
 +    }
 +
 +    /**
@@ -26,10 +26,23 @@
          return ItemAttributeModifiers.builder()
              .add(
                  Attributes.ATTACK_DAMAGE,
+                 new AttributeModifier(
+-                    BASE_ATTACK_DAMAGE_ID, (double)((float)attackDamage + tier.getAttackDamageBonus()), AttributeModifier.Operation.ADD_VALUE
++                    BASE_ATTACK_DAMAGE_ID, (double)((float)p_331976_ + p_330371_.getAttackDamageBonus()), AttributeModifier.Operation.ADD_VALUE
+                 ),
+                 EquipmentSlotGroup.MAINHAND
+             )
+             .add(
+                 Attributes.ATTACK_SPEED,
+-                new AttributeModifier(BASE_ATTACK_SPEED_ID, (double)attackSpeed, AttributeModifier.Operation.ADD_VALUE),
++                new AttributeModifier(BASE_ATTACK_SPEED_ID, (double)p_332104_, AttributeModifier.Operation.ADD_VALUE),
+                 EquipmentSlotGroup.MAINHAND
+             )
+             .build();
 @@ -55,5 +_,10 @@
      @Override
-     public void postHurtEnemy(ItemStack p_345553_, LivingEntity p_345771_, LivingEntity p_346282_) {
-         p_345553_.hurtAndBreak(1, p_346282_, EquipmentSlot.MAINHAND);
+     public void postHurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+         stack.hurtAndBreak(1, attacker, EquipmentSlot.MAINHAND);
 +    }
 +
 +    @Override

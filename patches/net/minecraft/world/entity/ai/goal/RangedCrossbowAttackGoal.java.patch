@@ -9,17 +9,25 @@
      public static final UniformInt PATHFINDING_DELAY_RANGE = TimeUtil.rangeOfSeconds(1, 2);
      private final T mob;
      private RangedCrossbowAttackGoal.CrossbowState crossbowState = RangedCrossbowAttackGoal.CrossbowState.UNCHARGED;
-@@ -24,6 +_,10 @@
+@@ -24,10 +_,14 @@
      private int attackDelay;
      private int updatePathDelay;
  
-+    public <M extends Monster & CrossbowAttackMob> RangedCrossbowAttackGoal(M p_25814_, double p_25815_, float p_25816_) {
-+        this((T) p_25814_, p_25815_, p_25816_);
+-    public RangedCrossbowAttackGoal(T mob, double speedModifier, float attackRadius) {
+-        this.mob = mob;
+-        this.speedModifier = speedModifier;
+-        this.attackRadiusSqr = attackRadius * attackRadius;
++    public <M extends Monster & CrossbowAttackMob> RangedCrossbowAttackGoal(M mob, double speedModifier, float attackRadius) {
++        this((T) mob, speedModifier, attackRadius);
 +    }
 +
-     public RangedCrossbowAttackGoal(T p_25814_, double p_25815_, float p_25816_) {
-         this.mob = p_25814_;
-         this.speedModifier = p_25815_;
++    public RangedCrossbowAttackGoal(T p_25814_, double p_25815_, float p_25816_) {
++        this.mob = p_25814_;
++        this.speedModifier = p_25815_;
++        this.attackRadiusSqr = p_25816_ * p_25816_;
+         this.setFlags(EnumSet.of(Goal.Flag.MOVE, Goal.Flag.LOOK));
+     }
+ 
 @@ -37,7 +_,7 @@
      }
  
