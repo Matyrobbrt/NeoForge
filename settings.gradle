@@ -35,7 +35,7 @@ pluginManagement {
 }
 
 plugins {
-    id 'net.neoforged.gradle.platform' version '7.0.160-pr-224-neodev-parchment'
+    id 'net.neoforged.gradle.platform' version '7.0.161-pr-224-neodev-parchment'
 }
 
 rootProject.name = rootDir.name
